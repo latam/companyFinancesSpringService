@@ -78,11 +78,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .exceptionHandling()
                 .authenticationEntryPoint(this.authenticationEntryPoint)
-
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
                 .and()
                 .authorizeRequests()
                 .antMatchers(loginEntryPoint, registrationEntryPoint, "/h2-console/**").permitAll()
