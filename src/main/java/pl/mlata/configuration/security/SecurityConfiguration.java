@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 import pl.mlata.configuration.security.authentication.JwtAuthenticationProvider;
 import pl.mlata.configuration.security.authentication.JwtLoginAuthenticationProvider;
 import pl.mlata.configuration.security.authentication.JwtLoginFilter;
@@ -40,6 +41,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private TokenExtractor tokenExtractor;
+    @Autowired
+    private CorsFilter corsFilter;
 
     private final String loginEntryPoint = "/auth/login";
     private final String registrationEntryPoint = "/auth/registration";
@@ -92,6 +95,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(
                         buildJwtAuthenticationProcessingFilter(),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilter(corsFilter);
     }
 }
