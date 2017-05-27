@@ -66,7 +66,7 @@ public class TokenAuthenticationService {
 
         String tokenHeader = jwtSettings.getPrefix() + jwtBody;
         response.addHeader(jwtSettings.getHeader(), tokenHeader);
-        objectMapper.writeValue(response.getWriter(), jwtBody);
+        objectMapper.writeValue(response.getWriter(), tokenHeader);
     }
 
     public Authentication getAuthentication(String token) throws AuthenticationException {
