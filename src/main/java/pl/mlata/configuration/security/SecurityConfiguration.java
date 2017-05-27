@@ -88,12 +88,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/**").authenticated()
                 .and()
+                .addFilterBefore(corsFilter, JwtLoginFilter.class)
                 .addFilterBefore(
                         buildJwtLoginFilter(),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(
                         buildJwtAuthenticationProcessingFilter(),
-                        UsernamePasswordAuthenticationFilter.class)
-                .addFilter(corsFilter);
+                        UsernamePasswordAuthenticationFilter.class);
     }
 }
