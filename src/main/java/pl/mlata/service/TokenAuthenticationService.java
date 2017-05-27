@@ -1,5 +1,6 @@
 package pl.mlata.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -18,6 +19,7 @@ import pl.mlata.exceptions.JwtExpiredTokenException;
 import pl.mlata.persistance.model.User;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -29,16 +31,19 @@ import java.util.stream.Stream;
 public class TokenAuthenticationService {
     private JwtSettings jwtSettings;
     private UserService userService;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    public TokenAuthenticationService(JwtSettings jwtSettings, UserService userService) {
+    public TokenAuthenticationService(JwtSettings jwtSettings, UserService userService, ObjectMapper objectMapper) {
         Assert.notNull(jwtSettings);
         Assert.notNull(userService);
+        Assert.notNull(objectMapper);
         this.jwtSettings = jwtSettings;
         this.userService = userService;
+        this.objectMapper = objectMapper;
     }
 
-    public void addAuthentication(HttpServletResponse response, String username) {
+    public void addAuthentication(HttpServletResponse response, String username) throws IOException {
 
         if (StringUtils.isBlank(username))
             throw new IllegalArgumentException("Username cannot be empty.");
@@ -61,6 +66,7 @@ public class TokenAuthenticationService {
 
         String tokenHeader = jwtSettings.getPrefix() + jwtBody;
         response.addHeader(jwtSettings.getHeader(), tokenHeader);
+        objectMapper.writeValue(response.getWriter(), jwtBody);
     }
 
     public Authentication getAuthentication(String token) throws AuthenticationException {
