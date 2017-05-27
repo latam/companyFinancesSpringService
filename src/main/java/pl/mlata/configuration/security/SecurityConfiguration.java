@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
@@ -88,12 +89,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/**").authenticated()
                 .and()
-                .addFilterBefore(corsFilter, JwtLoginFilter.class)
                 .addFilterBefore(
                         buildJwtLoginFilter(),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(
                         buildJwtAuthenticationProcessingFilter(),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(corsFilter, ChannelProcessingFilter.class);
     }
+
 }
