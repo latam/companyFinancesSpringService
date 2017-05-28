@@ -10,7 +10,7 @@ import pl.mlata.service.CompanyService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/company")
+@RequestMapping(value = "/api/company")
 public class CompanyController {
     @Autowired
     private CompanyService companyService;

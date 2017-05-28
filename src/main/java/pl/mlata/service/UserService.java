@@ -9,7 +9,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.mlata.configuration.security.authentication.JwtTokenAuthentication;
+import pl.mlata.persistance.model.Company;
 import pl.mlata.persistance.model.User;
+import pl.mlata.persistance.repository.CompanyRepository;
 import pl.mlata.persistance.repository.UserRepository;
 import pl.mlata.dto.RegistrationDTO;
 
@@ -26,6 +28,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private CompanyRepository companyRepository;
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
 
@@ -37,11 +41,14 @@ public class UserService {
     @Transactional
     public void registerNewAccount(RegistrationDTO registrationData) {
         User user = new User(registrationData);
-
+        Company company = registrationData.getCompany();
         String encodedPassword = passwordEncoder.encode(registrationData.getPassword());
         user.setPassword(encodedPassword);
 
         user = userRepository.save(user);
+
+        company.setUser(user);
+        companyRepository.save(company);
     }
 
     public User getCurrentUser() {

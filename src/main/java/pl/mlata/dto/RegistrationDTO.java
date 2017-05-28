@@ -1,5 +1,7 @@
 package pl.mlata.dto;
 
+import pl.mlata.persistance.model.Company;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -15,6 +17,9 @@ public class RegistrationDTO {
     private String lastName;
     @NotNull
     private String email;
+    @NotNull
+    private Company company;
+
 
     public RegistrationDTO() {
     }
@@ -57,5 +62,13 @@ public class RegistrationDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 }
