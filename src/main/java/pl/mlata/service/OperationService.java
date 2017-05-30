@@ -37,13 +37,13 @@ public class OperationService {
         Company userCompany = companyService.getUserCompany();
         operation.setCompany(userCompany);
 
-        operation = operationRepository.save(operation);
-
         VatRegistryEntry vatRegistryEntry = vatRegistryService.createEntryFromOperation(operation);
         KpirRegistryEntry kpirRegistryEntry = kpirRegistryService.createEntryFromOperation(operation);
 
         operation.setVatRegistryEntry(vatRegistryEntry);
         operation.setKpirRegistryEntry(kpirRegistryEntry);
+
+        operation = operationRepository.save(operation);
 
         return operation;
     }

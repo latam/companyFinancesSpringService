@@ -48,6 +48,7 @@ public class UserService {
         user = userRepository.save(user);
 
         company.setUser(user);
+        company.setActive(true);
         companyRepository.save(company);
     }
 

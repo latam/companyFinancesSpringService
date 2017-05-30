@@ -10,9 +10,6 @@ import pl.mlata.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-/**
- * Created by Mateusz on 05.04.2017.
- */
 @RestController
 public class AccountController {
     @Autowired

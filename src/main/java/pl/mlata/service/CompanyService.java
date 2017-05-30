@@ -34,6 +34,12 @@ public class CompanyService {
         return userCompany.orElseThrow(() -> new ResourceNotFoundException("User company was not found", "userCompany"));
     }
 
+    public Company getContractor(Long contractorId) {
+        Long userId = userService.getCurrentUser().getId();
+        Optional<Company> contractor = Optional.of(companyRepository.findByIdAndUserIdAndContractorAndActive(contractorId, userId, true, true));
+        return contractor.orElseThrow(() -> new ResourceNotFoundException("Company was not found", "contractor"));
+    }
+
     public List<Company> getContractors() {
         Long userId = userService.getCurrentUser().getId();
         return companyRepository.findByUserIdAndContractorAndActive(userId, true, true);
@@ -66,6 +72,13 @@ public class CompanyService {
         tmpCompany.setUser(userService.getCurrentUser());
 
         return companyRepository.save(tmpCompany);
+    }
+
+    public void deleteContractor(Long contractorId) {
+        Company companyToDelete = getContractor(contractorId);
+        companyToDelete.setActive(false);
+
+        companyRepository.save(companyToDelete);
     }
 
     public boolean belongsToUser(Long companyId) {

@@ -54,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     protected JwtTokenAuthenticationProcessingFilter buildJwtAuthenticationProcessingFilter() throws Exception {
-        List<String> pathsToSkip = Arrays.asList(loginEntryPoint, registrationEntryPoint);
+        List<String> pathsToSkip = Arrays.asList(loginEntryPoint, registrationEntryPoint, "api/h2-console/**");
         SkipRequestPathMatcher matcher = new SkipRequestPathMatcher(pathsToSkip, "/**");
         JwtTokenAuthenticationProcessingFilter filter
                 = new JwtTokenAuthenticationProcessingFilter(matcher, failureHandler, tokenExtractor);

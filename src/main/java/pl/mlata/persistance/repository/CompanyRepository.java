@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface CompanyRepository extends CrudRepository<Company, Long> {
     List<Company> findByUserIdAndContractorAndActive(Long userId, Boolean contractor, Boolean active);
+    Company findByIdAndUserIdAndContractorAndActive(Long id, Long userId, Boolean contractor, Boolean active);
 }
