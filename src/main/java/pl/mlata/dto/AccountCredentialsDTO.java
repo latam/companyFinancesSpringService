@@ -1,10 +1,10 @@
 package pl.mlata.dto;
 
-public class AccountCredentials {
+public class AccountCredentialsDTO {
     private String username;
     private String password;
 
-    public AccountCredentials() {
+    public AccountCredentialsDTO() {
     }
 
     public String getUsername() {

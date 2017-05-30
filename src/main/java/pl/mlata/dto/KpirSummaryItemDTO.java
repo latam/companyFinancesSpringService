@@ -1,11 +1,11 @@
-package pl.mlata.reports.dto;
+package pl.mlata.dto;
 
 import java.math.BigDecimal;
 
-public class KpirSummTableItem extends KpirFinancialColumns {
+public class KpirSummaryItemDTO extends KpirFinancialColumns {
     private String caption;
 
-    public KpirSummTableItem() {
+    public KpirSummaryItemDTO() {
         caption = "";
         revProductServices = new BigDecimal(0.0);
         revOther = new BigDecimal(0.0);
@@ -17,7 +17,7 @@ public class KpirSummTableItem extends KpirFinancialColumns {
         expCombined = new BigDecimal(0.0);
     }
 
-    public KpirSummTableItem(String caption, KpirSummTableItem item) {
+    public KpirSummaryItemDTO(String caption, KpirSummaryItemDTO item) {
         this.caption = caption;
         this.revProductServices = item.revProductServices;
         this.revOther = item.revOther;
@@ -29,7 +29,7 @@ public class KpirSummTableItem extends KpirFinancialColumns {
         this.expCombined = item.expCombined;
     }
 
-    public void Summ(KpirSummTableItem item) {
+    public void Summ(KpirSummaryItemDTO item) {
         this.revProductServices = this.revProductServices.add(item.revProductServices);
         this.revOther =  this.revOther.add(item.revOther);
         this.revCombined = this.revCombined.add(item.revCombined);
@@ -40,7 +40,7 @@ public class KpirSummTableItem extends KpirFinancialColumns {
         this.expCombined = this.expCombined.add(item.expCombined);
     }
 
-    public void Summ(KpirRegistryTableItem item) {
+    public void Summ(KpirRegistryItemDTO item) {
         this.revProductServices = this.revProductServices.add(item.getRevProductServices());
         this.revOther =  this.revOther.add(item.getRevOther());
         this.revCombined = this.revCombined.add(item.getRevCombined());

@@ -1,10 +1,10 @@
-package pl.mlata.reports.dto;
+package pl.mlata.dto;
 
 import pl.mlata.persistance.model.VatInvoiceEntry;
 
 import java.math.BigDecimal;
 
-public class VatInvoiceTableItem {
+public class VatInvoiceItemDTO {
     private Integer position;
     private String name;
     private String unit;
@@ -15,10 +15,10 @@ public class VatInvoiceTableItem {
     private BigDecimal taxValue;
     private BigDecimal bruttoValue;
 
-    public VatInvoiceTableItem() {
+    public VatInvoiceItemDTO() {
     }
 
-    public VatInvoiceTableItem(VatInvoiceEntry invoiceEntry) {
+    public VatInvoiceItemDTO(VatInvoiceEntry invoiceEntry) {
         name = invoiceEntry.getName();
         position = invoiceEntry.getPosition();
         unit = invoiceEntry.getUnit();

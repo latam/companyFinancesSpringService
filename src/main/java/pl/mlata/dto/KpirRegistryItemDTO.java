@@ -1,11 +1,11 @@
-package pl.mlata.reports.dto;
+package pl.mlata.dto;
 
 import pl.mlata.persistance.model.KpirRegistryEntry;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class KpirRegistryTableItem extends KpirFinancialColumns {
+public class KpirRegistryItemDTO extends KpirFinancialColumns {
     private Integer position;
     private Date date;
     private String number;
@@ -14,11 +14,11 @@ public class KpirRegistryTableItem extends KpirFinancialColumns {
     private String description;
     private String points;
 
-    public KpirRegistryTableItem() {
+    public KpirRegistryItemDTO() {
         super();
     }
 
-    public KpirRegistryTableItem(KpirRegistryEntry kpirRegistryEntry) {
+    public KpirRegistryItemDTO(KpirRegistryEntry kpirRegistryEntry) {
         this.position = kpirRegistryEntry.getPosition();
         this.date = java.sql.Date.valueOf(kpirRegistryEntry.getDate());
         this.number = kpirRegistryEntry.getDocNumber();

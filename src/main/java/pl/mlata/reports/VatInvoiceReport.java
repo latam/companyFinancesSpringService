@@ -4,8 +4,8 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import pl.mlata.persistance.model.Company;
 import pl.mlata.persistance.model.VatInvoice;
 import pl.mlata.persistance.model.VatInvoiceEntry;
-import pl.mlata.reports.dto.VatInvoiceTableItem;
-import pl.mlata.reports.dto.VatSummTableItem;
+import pl.mlata.dto.VatInvoiceItemDTO;
+import pl.mlata.dto.VatSummaryItemDTO;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,9 +31,9 @@ public class VatInvoiceReport {
         parameters.put(ReportUtils.VatInvoiceParams.bankName, "mBank");
         parameters.put(ReportUtils.VatInvoiceParams.accountNumber, "21 1140 2004 0000 3102 7586 9391");
 
-        List<VatInvoiceTableItem> tableItems = getTableItems(invoiceData);
-        List<VatSummTableItem> summTableItems = getSummTableItems(tableItems);
-        VatSummTableItem summTableItem = summTableItems.get(summTableItems.size()-1);
+        List<VatInvoiceItemDTO> tableItems = getTableItems(invoiceData);
+        List<VatSummaryItemDTO> summTableItems = getSummTableItems(tableItems);
+        VatSummaryItemDTO summTableItem = summTableItems.get(summTableItems.size()-1);
 
         Map<String, Object> bruttoValueParameters = getBruttoValueParameters(summTableItem);
         parameters.putAll(bruttoValueParameters);
@@ -73,25 +73,25 @@ public class VatInvoiceReport {
         return parameters;
     }
 
-    private List<VatInvoiceTableItem> getTableItems(VatInvoice invoiceData) {
-        List<VatInvoiceTableItem> tableItems = new ArrayList<>();
-        VatInvoiceTableItem item;
+    private List<VatInvoiceItemDTO> getTableItems(VatInvoice invoiceData) {
+        List<VatInvoiceItemDTO> tableItems = new ArrayList<>();
+        VatInvoiceItemDTO item;
         for (VatInvoiceEntry invoiceEntry : invoiceData.getEntries()) {
-            item = new VatInvoiceTableItem(invoiceEntry);
+            item = new VatInvoiceItemDTO(invoiceEntry);
             tableItems.add(item);
         }
         return tableItems;
     }
 
-    private List<VatSummTableItem> getSummTableItems(List<VatInvoiceTableItem> tableItems) {
-        List<VatSummTableItem> summTableItems = new ArrayList<>();
+    private List<VatSummaryItemDTO> getSummTableItems(List<VatInvoiceItemDTO> tableItems) {
+        List<VatSummaryItemDTO> summTableItems = new ArrayList<>();
         Map<Integer, BigDecimal> vatSummMap = getVatSummMap(tableItems);
 
-        VatSummTableItem total = new VatSummTableItem();
+        VatSummaryItemDTO total = new VatSummaryItemDTO();
         total.setCaption("Razem");
 
         for (Integer vatBid : vatSummMap.keySet()) {
-            VatSummTableItem item = new VatSummTableItem();
+            VatSummaryItemDTO item = new VatSummaryItemDTO();
 
             BigDecimal nettoValue = vatSummMap.get(vatBid);
             BigDecimal taxValue = nettoValue.multiply(new BigDecimal(vatBid));
@@ -112,10 +112,10 @@ public class VatInvoiceReport {
         return summTableItems;
     }
 
-    private Map<Integer, BigDecimal> getVatSummMap(List<VatInvoiceTableItem> tableItems) {
+    private Map<Integer, BigDecimal> getVatSummMap(List<VatInvoiceItemDTO> tableItems) {
         Map<Integer, BigDecimal> vatSummMap = new HashMap<>();
 
-        for(VatInvoiceTableItem item : tableItems) {
+        for(VatInvoiceItemDTO item : tableItems) {
             Integer vatBid = item.getVatBid();
             BigDecimal nettoValue = item.getNettoValue();
 
@@ -137,9 +137,9 @@ public class VatInvoiceReport {
         return vatBid.toString();
     }
 
-    private Map<String, Object> getBruttoValueParameters(VatSummTableItem vatSummTableItem) {
+    private Map<String, Object> getBruttoValueParameters(VatSummaryItemDTO vatSummaryItemDTO) {
         Map<String, Object> parameters = new HashMap<>();
-        BigDecimal summBruttoValue = vatSummTableItem.getBruttoValue();
+        BigDecimal summBruttoValue = vatSummaryItemDTO.getBruttoValue();
 
         parameters.put(ReportUtils.VatInvoiceParams.summValue, summBruttoValue);
 

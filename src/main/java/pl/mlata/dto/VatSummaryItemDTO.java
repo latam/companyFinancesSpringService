@@ -1,24 +1,24 @@
-package pl.mlata.reports.dto;
+package pl.mlata.dto;
 
 import java.math.BigDecimal;
 
-public class VatSummTableItem {
+public class VatSummaryItemDTO {
     private BigDecimal nettoValue;
     private String caption;
     private BigDecimal taxValue;
     private BigDecimal bruttoValue;
 
-    public VatSummTableItem() {
+    public VatSummaryItemDTO() {
         nettoValue = new BigDecimal(0);
         taxValue = new BigDecimal(0);
         bruttoValue = new BigDecimal(0);
         caption = "";
     }
 
-    public void Summ(VatSummTableItem vatSummTableItem) {
-        this.nettoValue = this.nettoValue.add(vatSummTableItem.getNettoValue());
-        this.taxValue = this.taxValue.add(vatSummTableItem.getTaxValue());
-        this.bruttoValue = this.bruttoValue.add(vatSummTableItem.getBruttoValue());
+    public void Summ(VatSummaryItemDTO vatSummaryItemDTO) {
+        this.nettoValue = this.nettoValue.add(vatSummaryItemDTO.getNettoValue());
+        this.taxValue = this.taxValue.add(vatSummaryItemDTO.getTaxValue());
+        this.bruttoValue = this.bruttoValue.add(vatSummaryItemDTO.getBruttoValue());
     }
 
     public BigDecimal getNettoValue() {

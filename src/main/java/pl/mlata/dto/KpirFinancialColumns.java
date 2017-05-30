@@ -1,4 +1,4 @@
-package pl.mlata.reports.dto;
+package pl.mlata.dto;
 
 import java.math.BigDecimal;
 

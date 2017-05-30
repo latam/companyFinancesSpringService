@@ -3,6 +3,8 @@ package pl.mlata.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.mlata.dto.VatRegistryItemDTO;
+import pl.mlata.dto.VatRegistrySummaryItemDTO;
 import pl.mlata.exceptions.ForbiddenResourceException;
 import pl.mlata.exceptions.ResourceNotFoundException;
 import pl.mlata.persistance.model.Company;
@@ -17,9 +19,8 @@ import pl.mlata.reports.VatRegistryReport;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class VatRegistryService {
@@ -39,16 +40,22 @@ public class VatRegistryService {
         return vatRegistryRepository.findOne(registryId);
     }
 
-    public List<VatRegistryEntry> getRegistryEntries(int month, int year) {
+    public List<VatRegistryItemDTO> getRegistryEntries(int month, int year) {
         VatRegistry vatRegistry = getRegistryForExport(month, year);
 
         if(vatRegistry == null || vatRegistry.getEntries() == null) {
             return new ArrayList<>();
         }
 
-        return vatRegistry.getEntries();
-    }
+        List<VatRegistryEntry> vatRegistryEntries = vatRegistry.getEntries();
 
+        Comparator<VatRegistryItemDTO> byEntryPosition = Comparator.comparingInt(VatRegistryItemDTO::getPosition);
+        List<VatRegistryItemDTO> vatRegistryItemDTOS = vatRegistryEntries.stream()
+                .map(registryEntry -> new VatRegistryItemDTO(registryEntry))
+                .sorted(byEntryPosition)
+                .collect(Collectors.toList());
+        return vatRegistryItemDTOS;
+    }
 
     public VatRegistry createRegistry(Integer period, Integer year) {
         VatRegistry vatRegistry = new VatRegistry();
@@ -123,7 +130,6 @@ public class VatRegistryService {
         Company company = companyService.getUserCompany();
         VatRegistry vatRegistry = vatRegistryRepository.findByCompanyAndPeriodAndYear(company, month, year);
 
-
         byte[] pdfReport = generateReport(vatRegistry);
         return pdfReport;
     }
@@ -141,7 +147,124 @@ public class VatRegistryService {
 
     private byte[] generateReport(VatRegistry vatRegistry) {
         VatRegistryReport report = new VatRegistryReport();
-        byte[] pdfReport = report.createReport(vatRegistry);
+        Company company = vatRegistry.getCompany();
+
+        List<VatRegistryItemDTO> tableItems = getTableItems(vatRegistry);
+        List<VatRegistrySummaryItemDTO> summTableItems = getSummary(vatRegistry);
+
+        String registryPeriod = vatRegistry.getPeriod() + "/" + vatRegistry.getYear();
+
+        byte[] pdfReport = report.createReport(registryPeriod, company, tableItems, summTableItems);
         return pdfReport;
+    }
+
+    private List<VatRegistryItemDTO> getTableItems(VatRegistry vatRegistry) {
+        List<VatRegistryItemDTO> tableItems = new ArrayList<>();
+
+        for (VatRegistryEntry registryEntry : vatRegistry.getEntries()) {
+            VatRegistryItemDTO item = getVatRegistryTableItem(registryEntry);
+            tableItems.add(item);
+        }
+
+        return tableItems;
+    }
+
+    private VatRegistryItemDTO getVatRegistryTableItem(VatRegistryEntry registryEntry) {
+        VatRegistryItemDTO item = new VatRegistryItemDTO();
+
+        Company contractor = registryEntry.getContractor();
+
+        item.setPosition(registryEntry.getPosition());
+        item.setDate(java.sql.Date.valueOf(registryEntry.getDate()));
+        item.setRegistry(getRegistryTypeText(registryEntry.isPurchase()));
+        item.setNumber(registryEntry.getDocNumber());
+
+        String contractorData = getContractorText(contractor);
+        item.setContractor(contractorData);
+
+        item.setDescription(registryEntry.getDescription());
+        item.setNettoValue(registryEntry.getNettoValue());
+
+        String vatBid = getVatBidText(registryEntry.getBid());
+        item.setVatBid(vatBid);
+
+        item.setVatValue(registryEntry.getVatValue());
+        return item;
+    }
+
+    private String getRegistryTypeText(boolean purchase) {
+        if (purchase)
+            return "Zakup";
+        return "Sprzedaż";
+    }
+
+    private String getContractorText(Company contractor) {
+        String contractorData = String.format("%s, %s, %s %s, NIP: %s",
+                contractor.getName(),
+                contractor.getStreet(),
+                contractor.getPostalCode(),
+                contractor.getCity(),
+                contractor.getNip());
+        return contractorData;
+    }
+
+    private String getVatBidText(String vatBid) {
+        if (vatBid.equals(-1)) {
+            return "zw.";
+        }
+        return vatBid.toString();
+    }
+
+    private List<VatRegistrySummaryItemDTO> getSummary(VatRegistry registryData) {
+        Map<String, VatRegistrySummaryItemDTO> vatSummMap = new HashMap<>();
+
+        for (VatRegistryEntry registryEntry : registryData.getEntries()) {
+            String vatBid = registryEntry.getBid();
+            VatRegistrySummaryItemDTO item;
+
+            if (vatSummMap.containsKey(vatBid)) {
+                item = vatSummMap.get(vatBid);
+            } else {
+                item = new VatRegistrySummaryItemDTO();
+                item.setVatBid(vatBid);
+            }
+
+            if (registryEntry.isPurchase()) {
+                BigDecimal nettoValue = item.getExpNettoValue();
+                nettoValue = nettoValue.add(registryEntry.getNettoValue());
+
+                BigDecimal rawVatBid = new BigDecimal(vatBid).divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
+                BigDecimal vatValue = nettoValue.multiply(rawVatBid);
+
+                BigDecimal bruttoValue = nettoValue.add(vatValue);
+                item.setExpNettoValue(nettoValue);
+                item.setExpBruttoValue(bruttoValue);
+                item.setExpTaxValue(vatValue);
+            } else {
+                BigDecimal nettoValue = item.getRevNettoValue();
+                nettoValue = nettoValue.add(registryEntry.getNettoValue());
+
+                BigDecimal rawVatBid = new BigDecimal(vatBid).divide(new BigDecimal(100), 2, RoundingMode.HALF_EVEN);
+                BigDecimal vatValue = nettoValue.multiply(rawVatBid);
+
+                BigDecimal bruttoValue = nettoValue.add(vatValue);
+                item.setRevNettoValue(nettoValue);
+                item.setRevBruttoValue(bruttoValue);
+                item.setRevTaxValue(vatValue);
+            }
+
+            vatSummMap.put(vatBid, item);
+        }
+
+        List<VatRegistrySummaryItemDTO> summTableItems = new ArrayList<>(vatSummMap.values());
+        VatRegistrySummaryItemDTO totalSummary = new VatRegistrySummaryItemDTO();
+        totalSummary.setVatBid("Razem");
+
+        for(VatRegistrySummaryItemDTO item : summTableItems) {
+            totalSummary.Summ(item);
+        }
+        summTableItems.add(totalSummary);
+
+        return summTableItems;
     }
 }

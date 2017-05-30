@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.mlata.dto.VatRegistryItemDTO;
 import pl.mlata.persistance.model.VatRegistryEntry;
 import pl.mlata.service.VatRegistryService;
 
@@ -21,8 +22,8 @@ public class VatRegistryController {
 
 
     @RequestMapping(value = "/entries/{month}/{year}", method = RequestMethod.GET)
-    public ResponseEntity<List<VatRegistryEntry>> getRegistry(@PathVariable Integer month, @PathVariable Integer year) {
-        List<VatRegistryEntry> entries = vatRegistryService.getRegistryEntries(month, year);
+    public ResponseEntity<List<VatRegistryItemDTO>> getRegistry(@PathVariable Integer month, @PathVariable Integer year) {
+        List<VatRegistryItemDTO> entries = vatRegistryService.getRegistryEntries(month, year);
         return new ResponseEntity<>(entries, HttpStatus.OK);
     }
 

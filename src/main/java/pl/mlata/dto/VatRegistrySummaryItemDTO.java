@@ -1,8 +1,8 @@
-package pl.mlata.reports.dto;
+package pl.mlata.dto;
 
 import java.math.BigDecimal;
 
-public class VatRegistrySummTableItem {
+public class VatRegistrySummaryItemDTO {
     private String vatBid;
     private BigDecimal expNettoValue;
     private BigDecimal expTaxValue;
@@ -12,7 +12,7 @@ public class VatRegistrySummTableItem {
     private BigDecimal revTaxValue;
     private BigDecimal revBruttoValue;
 
-    public VatRegistrySummTableItem() {
+    public VatRegistrySummaryItemDTO() {
         vatBid = "";
         this.expNettoValue = new BigDecimal(0);
         this.expTaxValue = new BigDecimal(0);
@@ -22,7 +22,7 @@ public class VatRegistrySummTableItem {
         this.revBruttoValue = new BigDecimal(0);
     }
 
-    public void Summ(VatRegistrySummTableItem item) {
+    public void Summ(VatRegistrySummaryItemDTO item) {
         this.expNettoValue = this.expNettoValue.add(item.getExpNettoValue());
         this.expTaxValue = this.expTaxValue.add(item.getExpTaxValue());
         this.expBruttoValue = this.expBruttoValue.add(item.getExpBruttoValue());

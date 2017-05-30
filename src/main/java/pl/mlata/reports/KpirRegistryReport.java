@@ -4,8 +4,8 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import pl.mlata.persistance.model.Company;
 import pl.mlata.persistance.model.KpirRegistry;
 import pl.mlata.persistance.model.KpirRegistryEntry;
-import pl.mlata.reports.dto.KpirRegistryTableItem;
-import pl.mlata.reports.dto.KpirSummTableItem;
+import pl.mlata.dto.KpirRegistryItemDTO;
+import pl.mlata.dto.KpirSummaryItemDTO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,14 +26,14 @@ public class KpirRegistryReport {
         Map<Integer, Map<String, Object>> allParameters = new HashMap<>();
         Integer parameterMapCounter = 0;
 
-        KpirSummTableItem totalSumm = new KpirSummTableItem();
+        KpirSummaryItemDTO totalSumm = new KpirSummaryItemDTO();
         totalSumm.setCaption("Razem od poczatku roku");
 
         for (KpirRegistry kpirRegistry : kpirRegistries) {
             Integer entriesCount = kpirRegistry.getEntries().size();
             Integer pagesCount = (int) Math.ceil(entriesCount.doubleValue() / entriesPerPage.doubleValue());
 
-            KpirSummTableItem prevPageSumm = new KpirSummTableItem();
+            KpirSummaryItemDTO prevPageSumm = new KpirSummaryItemDTO();
             prevPageSumm.setCaption("Przeniesienie z poprzedniej strony");
             for (int page = 1; page <= pagesCount; page++) {
                 Map<String, Object> parameters = new HashMap<>();
@@ -50,10 +50,10 @@ public class KpirRegistryReport {
                 parameters.put("month", kpirRegistry.getPeriod());
                 parameters.put("year", kpirRegistry.getYear());
 
-                List<KpirRegistryTableItem> tableItems = new ArrayList<>();
-                List<KpirSummTableItem> summTableItems = new ArrayList<>();
+                List<KpirRegistryItemDTO> tableItems = new ArrayList<>();
+                List<KpirSummaryItemDTO> summTableItems = new ArrayList<>();
 
-                KpirSummTableItem pageSumm = new KpirSummTableItem();
+                KpirSummaryItemDTO pageSumm = new KpirSummaryItemDTO();
                 pageSumm.setCaption("Suma strony");
                 Integer startIndex = ((page - 1) * entriesPerPage);
                 Integer endIndex = startIndex + entriesPerPage;
@@ -63,7 +63,7 @@ public class KpirRegistryReport {
 
                 for (Integer entryCounter = startIndex; entryCounter < endIndex; entryCounter++) {
                     KpirRegistryEntry kpirRegistryEntry = kpirRegistry.getEntries().get(entryCounter);
-                    KpirRegistryTableItem item = new KpirRegistryTableItem(kpirRegistryEntry);
+                    KpirRegistryItemDTO item = new KpirRegistryItemDTO(kpirRegistryEntry);
                     pageSumm.Summ(item);
                     tableItems.add(item);
                 }
@@ -79,8 +79,8 @@ public class KpirRegistryReport {
                 parameters.put(ReportUtils.VatInvoiceParams.tableDataSource, tableDataSource);
                 parameters.put(ReportUtils.VatInvoiceParams.summTableDataSource, summTableDataSource);
 
-                totalSumm = new KpirSummTableItem(totalSumm.getCaption(), totalSumm);
-                prevPageSumm = new KpirSummTableItem(prevPageSumm.getCaption(), pageSumm);
+                totalSumm = new KpirSummaryItemDTO(totalSumm.getCaption(), totalSumm);
+                prevPageSumm = new KpirSummaryItemDTO(prevPageSumm.getCaption(), pageSumm);
 
                 allParameters.put(parameterMapCounter, parameters);
                 parameterMapCounter++;

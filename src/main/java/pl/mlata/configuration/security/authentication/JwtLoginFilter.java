@@ -11,9 +11,8 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.StringUtils;
-import pl.mlata.dto.AccountCredentials;
+import pl.mlata.dto.AccountCredentialsDTO;
 import pl.mlata.service.TokenAuthenticationService;
-import pl.mlata.service.UserService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -37,8 +36,8 @@ public class JwtLoginFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws AuthenticationException, IOException, ServletException {
-        AccountCredentials credentials = new ObjectMapper()
-                .readValue(httpServletRequest.getInputStream(), AccountCredentials.class);
+        AccountCredentialsDTO credentials = new ObjectMapper()
+                .readValue(httpServletRequest.getInputStream(), AccountCredentialsDTO.class);
 
         if (StringUtils.isEmpty(credentials.getUsername()) || StringUtils.isEmpty(credentials.getPassword())) {
             throw new AuthenticationServiceException("Username or Password not provided");

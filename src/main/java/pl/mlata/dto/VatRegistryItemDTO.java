@@ -1,9 +1,11 @@
-package pl.mlata.reports.dto;
+package pl.mlata.dto;
+
+import pl.mlata.persistance.model.VatRegistryEntry;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class VatRegistryTableItem {
+public class VatRegistryItemDTO {
     private Integer position;
     private Date date;
     private String registry;
@@ -14,7 +16,21 @@ public class VatRegistryTableItem {
     private BigDecimal nettoValue;
     private BigDecimal vatValue;
 
-    public VatRegistryTableItem() {
+    public VatRegistryItemDTO() {
+    }
+
+    public VatRegistryItemDTO(VatRegistryEntry registryEntry) {
+        this.position = registryEntry.getPosition();
+        this.date = java.sql.Date.valueOf(registryEntry.getDate());
+        if (registryEntry.isPurchase())
+            this.registry = "Zakup";
+        this.registry = "Sprzedaż";
+        this.number = registryEntry.getDocNumber();
+        this.contractor = registryEntry.getContractor().getName();
+        this.description = registryEntry.getDescription();
+        this.vatBid = registryEntry.getBid();
+        this.nettoValue = registryEntry.getNettoValue();
+        this.vatValue = registryEntry.getVatValue();
     }
 
     public Integer getPosition() {
